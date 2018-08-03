@@ -3,6 +3,7 @@ package mybi.data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,6 @@ public class DataHandler {
 		list=new ArrayList<>();
 
 		MybiHead mybiHead = new MybiHead();
-		MybiRecord mybiRecord = new MybiRecord();
 		MybiTailar mybiTailar = new MybiTailar();
 		//MybiMata mybiMata = new MybiMata();
 
@@ -60,22 +60,26 @@ public class DataHandler {
 			if (b[0] == 0x48) { // Head
 				mybiHead.pack(b);
 			} else if (b[0] == 0x44) { // record
+				MybiRecord mybiRecord = new MybiRecord();
+				if(b[1] != 0x20){
+					String str = new String(b, "euc-kr");
+					String subStr = str.substring(str.lastIndexOf("                                         ") + 41);
+					str = str.substring(0,str.lastIndexOf("                                         ") + 41);
+					b = (subStr + (str)).getBytes(Charset.forName("euc-kr"));
+				}
 				mybiRecord.pack(b);
-				//System.out.println(mybiRecord.toString());
-				System.out.println(file.getAbsolutePath());
 				mybiRecord.setFileName(file.getAbsolutePath());
+				mybiRecord.setRawRecord(new String(b, "euc-kr"));
+				System.out.println("==> " + new String(b, "euc-kr"));
 				list.add(mybiRecord);
-				
-				
 			} else if (b[0] == 0x54) { // tail
 				mybiTailar.pack(b);
 			} else {
-				System.out.println("b[0]=식별할 수 없는 값." + count);
+				//System.out.println("b[0]=식별할 수 없는 값." + count);
 				// System.exit(-1); // 고민
 			}
 
 		}
-		
 		manager.RecordSQL(list);
 		//mybiMata.setTitle(this.fileName);
 		//mybiMata.setSize(this.fileSize);

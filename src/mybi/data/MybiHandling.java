@@ -19,24 +19,17 @@ public class MybiHandling {
 	public static void main(String[] args) throws IOException {
 		DataHandler dataHandler = new DataHandler();
 		//System.out.println("args[0]=> " + args[0]);
-
-		
-		File dir = new File("/home/charisma0629/mybi/archive");
+		File dir = new File("D:\\mybi_data_handling\\Data");
 		if (dir.isDirectory()) {
 			File[] subNote = dir.listFiles();
 			for (File dirName : subNote) {
 				System.out.println("dirName "+dirName);
-				 
-				for(File file :dirName.listFiles()) {
+				File dirs[] = dirName.listFiles();
+				for(File file : dirs) {
 					System.out.println("file path "+file.getAbsolutePath());
-					dataHandler.testReadDataFiles(file.getAbsolutePath());
+				    dataHandler.testReadDataFiles(file.getAbsolutePath());
 				}
-				
-				 
 			}
 		}
-
 	}
-
-	
 }

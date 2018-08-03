@@ -29,7 +29,7 @@ public class DatabaseManager {
 			Class.forName(Jdbc_driver);
 			conn = DriverManager.getConnection(Jdbc_url, "root", "Dbnis3258!@#$");
 
-			String sql = "INSERT INTO mybi("
+			String sql = "INSERT INTO mybi_doc("
 					+ "사업자번호,"
 					+ "운수사, "
 					+ "카드거래일자, "
@@ -55,14 +55,14 @@ public class DatabaseManager {
 					+ "이전정류장코드, "
 					+ "이전정류장명,"
 					+ "DATA구분,"
-					+ "FILENAME) "
-					+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+					+ "FILENAME,"
+					+ "RAW_DATA) "
+					+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			pstmt = conn.prepareStatement(sql);
 
 			String charsetName = "euc-kr";
 			System.out.println("List size =>"+mybList.size());
 			for(MybiRecord mybiRecord: mybList) {
-				System.out.println("fileName " +mybiRecord.getFileName());
 				pstmt.setString(1, new String(mybiRecord.get사업자번호(), charsetName));
 				pstmt.setString(2, new String(mybiRecord.get운수사(), charsetName));
 				pstmt.setString(3, new String(mybiRecord.get카드거래일자(), charsetName));
@@ -81,30 +81,40 @@ public class DatabaseManager {
 				pstmt.setInt(15, Integer.parseInt(new String(mybiRecord.get학생건수())));// 문제
 				pstmt.setInt(16, Integer.parseInt(new String(mybiRecord.get소인건수())));// 문제
 				pstmt.setInt(17, Integer.parseInt(new String(mybiRecord.get기타건수())));// 문제
-				pstmt.setInt(18, Integer.parseInt(new String(mybiRecord.get거래금액())));// 문제
-				pstmt.setInt(19, Integer.parseInt(new String(mybiRecord.get환승FLAG())));// 문제
-				pstmt.setInt(20, Integer.parseInt(new String(mybiRecord.get이전노선코드())));// 문제
+				try{
+					pstmt.setInt(18, Integer.parseInt(new String(mybiRecord.get거래금액())));// 문제
+				}catch(Exception ex){
+					pstmt.setInt(18, 0);
+				}
+				try{
+					pstmt.setInt(19, Integer.parseInt(new String(mybiRecord.get환승FLAG())));// 문제
+				}catch(Exception ex){
+					pstmt.setInt(19, 0);// 문제
+				}
+				try{
+					pstmt.setInt(20, Integer.parseInt(new String(mybiRecord.get이전노선코드())));// 문제
+				}catch(Exception ex){
+					pstmt.setInt(20, 0);// 문제
+				}
 				
 				pstmt.setString(21, new String(mybiRecord.get이전거래일자(), charsetName));
 				pstmt.setString(22, new String(mybiRecord.get이전거래시간(), charsetName));
-				pstmt.setInt(23, Integer.parseInt(new String(mybiRecord.get이전정류장코드())));// 문제
+				try{
+					pstmt.setInt(23, Integer.parseInt(new String(mybiRecord.get이전정류장코드())));// 문제
+				}catch(Exception ex){
+					pstmt.setInt(23, 0);// 문제
+				}
 				pstmt.setString(24, new String(mybiRecord.get이전정류장명(), charsetName));
 				
 				// new field
 				pstmt.setString(25, new String(mybiRecord.getDATA구분(),charsetName));
 				pstmt.setString(26, mybiRecord.getFileName());
+				pstmt.setString(27, mybiRecord.getRawRecord());
 				//pstmt.executeUpdate();
 				pstmt.addBatch();
-			
-				
 			}
-			
 			pstmt.executeBatch();
 			//pstmt.executeLargeUpdate(); //쿼리 실행시 2배로 들어감 ?
-			
-			
-		
-
 		}
 
 		catch (Exception e) {
